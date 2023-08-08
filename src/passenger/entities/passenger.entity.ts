@@ -14,7 +14,7 @@ export class Passenger extends BaseEntity {
   })
   nroPassport: number;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   name: string;
 
   @Column({ type: 'varchar', length: 100, nullable: false })

@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import { Passenger } from './entities/passenger.entity';
 import { PassengerService } from './passenger.service';
 import { Repository } from 'typeorm';
+import { validatePassenger } from './schemas/passenger.schema';
 import AppDataSource from './../database/config';
 import AppError from '../errors/utils/appError';
 import catchAsync from '../errors/utils/catchAsync';
+import { validatePartialPassenger } from './schemas/passenger.schema';
 
 const passengerRepository: Repository<Passenger> =
   AppDataSource.getRepository('Passenger');
@@ -21,7 +23,16 @@ export const findAll = catchAsync(
 
 export const create = catchAsync(
   async (req: Request, res: Response, _next: NextFunction) => {
-    const passenger = await passengerService.createPassenger(req.body);
+    const result = validatePassenger(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        status: 'error',
+        message: JSON.parse(result.error.message),
+      });
+    }
+
+    const passenger = await passengerService.createPassenger(result.data);
 
     return res.status(201).json(passenger);
   }
@@ -41,6 +52,15 @@ export const findOne = catchAsync(
 
 export const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    const result = validatePartialPassenger(req.body);
+
+    if (!result.success) {
+      return res.status(400).json({
+        status: 'error',
+        message: JSON.parse(result.error.message),
+      });
+    }
+
     const passenger = await passengerService.findOnePassenger(req.params.id);
 
     if (!passenger) {
@@ -49,7 +69,7 @@ export const update = catchAsync(
 
     const passengerUpdated = await passengerService.updatePassenger(
       passenger,
-      req.body
+      result.data
     );
 
     return res.status(200).json(passengerUpdated);

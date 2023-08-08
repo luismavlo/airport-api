@@ -1,6 +1,5 @@
 import { Passenger } from './entities/passenger.entity';
 import { Repository } from 'typeorm';
-import { infoToUpdateUser } from './types/passenger.type';
 
 export class PassengerService {
   private passengerRepository: Repository<Passenger>;
@@ -17,7 +16,7 @@ export class PassengerService {
     });
   }
 
-  async createPassenger(passenger: Passenger): Promise<Passenger> {
+  async createPassenger(passenger: any): Promise<Passenger[]> {
     const passengerCreated = this.passengerRepository.create(passenger);
     return this.passengerRepository.save(passengerCreated);
   }
@@ -31,10 +30,7 @@ export class PassengerService {
     });
   }
 
-  async updatePassenger(
-    passenger: Passenger,
-    data: infoToUpdateUser
-  ): Promise<Passenger> {
+  async updatePassenger(passenger: Passenger, data: any): Promise<Passenger> {
     passenger.email = data.email;
     passenger.celphone = data.celphone;
     return this.passengerRepository.save(passenger);
